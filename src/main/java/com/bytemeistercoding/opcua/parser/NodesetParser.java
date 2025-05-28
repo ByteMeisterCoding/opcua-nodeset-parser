@@ -50,11 +50,6 @@ public class NodesetParser {
             throw new JAXBException("Failed to parse nodeset file: " + filePath, e);
         }
     }
-
-    public static void main(String[] args) throws JAXBException, IOException {
-        NodesetParser parser = new NodesetParser();
-        parser.parseNodesetFile("nodeset-files/test-model.xml");
-    }
-
+    
 }
 
