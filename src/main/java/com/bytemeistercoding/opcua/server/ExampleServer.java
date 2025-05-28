@@ -60,19 +60,9 @@ public class ExampleServer {
 
     private static final int TCP_BIND_PORT = 12686;
     private static final int HTTPS_BIND_PORT = 8443;
+    private final OpcUaServer server;
+    private CustomNamespace customNamespace;
     private static final Logger logger = LoggerFactory.getLogger(ExampleServer.class);
-
-    static {
-        // Required for SecurityPolicy.Aes256_Sha256_RsaPss
-        Security.addProvider(new BouncyCastleProvider());
-
-        try {
-            NonceUtil.blockUntilSecureRandomSeeded(10, TimeUnit.SECONDS);
-        } catch (ExecutionException | InterruptedException | TimeoutException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-    }
 
     public static void main(String[] args) throws Exception {
         ExampleServer server = new ExampleServer();
@@ -86,7 +76,17 @@ public class ExampleServer {
         future.get();
     }
 
-    private final OpcUaServer server;
+    static {
+        // Required for SecurityPolicy.Aes256_Sha256_RsaPss
+        Security.addProvider(new BouncyCastleProvider());
+
+        try {
+            NonceUtil.blockUntilSecureRandomSeeded(10, TimeUnit.SECONDS);
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+    }
 
     public ExampleServer() throws Exception {
         Path securityTempDir = Paths.get(System.getProperty("java.io.tmpdir"), "server", "security");
@@ -172,7 +172,7 @@ public class ExampleServer {
         server = new OpcUaServer(serverConfig);
         NodesetParser nodesetParser = new NodesetParser();
         UANodeSet sampleModelNodeset = nodesetParser.parseNodesetFile("nodeset-files/sample-model.xml");
-        CustomNamespace customNamespace = new CustomNamespace(server, sampleModelNodeset);
+        customNamespace = new CustomNamespace(server, sampleModelNodeset);
         customNamespace.startup();
     }
 
@@ -267,7 +267,7 @@ public class ExampleServer {
     }
 
     public CompletableFuture<OpcUaServer> shutdown() {
-        //customNamespace.shutdown();
+        customNamespace.shutdown();
         return server.shutdown();
     }
 
