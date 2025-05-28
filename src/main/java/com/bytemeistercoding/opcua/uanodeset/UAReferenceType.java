@@ -23,7 +23,7 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;extension base="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}UAType">
  *       &lt;sequence>
- *         &lt;element name="InverseName" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}LocalizedText" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="InverseName" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}UALocalizedText" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="Symmetric" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
  *     &lt;/extension>
@@ -39,7 +39,7 @@ public class UAReferenceType
         extends UAType {
 
     @XmlElement(name = "InverseName")
-    protected List<LocalizedText> inverseName;
+    protected List<UALocalizedText> inverseName;
     @XmlAttribute(name = "Symmetric")
     protected Boolean symmetric;
 
@@ -61,11 +61,11 @@ public class UAReferenceType
      *
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link LocalizedText }
+     * {@link UALocalizedText }
      */
-    public List<LocalizedText> getInverseName() {
+    public List<UALocalizedText> getInverseName() {
         if (inverseName == null) {
-            inverseName = new ArrayList<LocalizedText>();
+            inverseName = new ArrayList<UALocalizedText>();
         }
         return this.inverseName;
     }

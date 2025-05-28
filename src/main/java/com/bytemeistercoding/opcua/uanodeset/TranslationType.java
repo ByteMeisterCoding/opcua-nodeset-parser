@@ -26,7 +26,7 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;choice minOccurs="0">
- *         &lt;element name="Text" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}LocalizedText" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="Text" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}UALocalizedText" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element name="Field" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}StructureTranslationType" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/choice>
  *     &lt;/restriction>
@@ -42,7 +42,7 @@ import java.util.List;
 public class TranslationType {
 
     @XmlElement(name = "Text")
-    protected List<LocalizedText> text;
+    protected List<UALocalizedText> text;
     @XmlElement(name = "Field")
     protected List<StructureTranslationType> field;
 
@@ -64,11 +64,11 @@ public class TranslationType {
      *
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link LocalizedText }
+     * {@link UALocalizedText }
      */
-    public List<LocalizedText> getText() {
+    public List<UALocalizedText> getText() {
         if (text == null) {
-            text = new ArrayList<LocalizedText>();
+            text = new ArrayList<UALocalizedText>();
         }
         return this.text;
     }

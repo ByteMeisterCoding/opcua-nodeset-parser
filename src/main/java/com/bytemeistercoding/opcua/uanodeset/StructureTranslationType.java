@@ -23,7 +23,7 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="Text" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}LocalizedText" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="Text" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}UALocalizedText" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="Name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
@@ -38,7 +38,7 @@ import java.util.List;
 public class StructureTranslationType {
 
     @XmlElement(name = "Text")
-    protected List<LocalizedText> text;
+    protected List<UALocalizedText> text;
     @XmlAttribute(name = "Name", required = true)
     protected String name;
 
@@ -60,11 +60,11 @@ public class StructureTranslationType {
      *
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link LocalizedText }
+     * {@link UALocalizedText }
      */
-    public List<LocalizedText> getText() {
+    public List<UALocalizedText> getText() {
         if (text == null) {
-            text = new ArrayList<LocalizedText>();
+            text = new ArrayList<UALocalizedText>();
         }
         return this.text;
     }

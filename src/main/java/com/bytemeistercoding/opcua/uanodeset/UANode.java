@@ -23,8 +23,8 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="DisplayName" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}LocalizedText" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="Description" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}LocalizedText" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="DisplayName" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}UALocalizedText" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="Description" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}UALocalizedText" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element name="Category" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element name="Documentation" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="References" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}ListOfReferences" minOccurs="0"/>
@@ -61,9 +61,9 @@ import java.util.List;
 public class UANode {
 
     @XmlElement(name = "DisplayName")
-    protected List<LocalizedText> displayName;
+    protected List<UALocalizedText> displayName;
     @XmlElement(name = "Description")
-    protected List<LocalizedText> description;
+    protected List<UALocalizedText> description;
     @XmlElement(name = "Category")
     protected List<String> category;
     @XmlElement(name = "Documentation")
@@ -109,11 +109,11 @@ public class UANode {
      *
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link LocalizedText }
+     * {@link UALocalizedText }
      */
-    public List<LocalizedText> getDisplayNames() {
+    public List<UALocalizedText> getDisplayNames() {
         if (displayName == null) {
-            displayName = new ArrayList<LocalizedText>();
+            displayName = new ArrayList<UALocalizedText>();
         }
         return this.displayName;
     }
@@ -136,11 +136,11 @@ public class UANode {
      *
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link LocalizedText }
+     * {@link UALocalizedText }
      */
-    public List<LocalizedText> getDescriptions() {
+    public List<UALocalizedText> getDescriptions() {
         if (description == null) {
-            description = new ArrayList<LocalizedText>();
+            description = new ArrayList<UALocalizedText>();
         }
         return this.description;
     }

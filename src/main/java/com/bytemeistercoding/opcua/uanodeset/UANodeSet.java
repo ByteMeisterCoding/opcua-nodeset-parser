@@ -26,7 +26,7 @@ import java.util.List;
  *       &lt;sequence>
  *         &lt;element name="NamespaceUris" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}UriTable" minOccurs="0"/>
  *         &lt;element name="ServerUris" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}UriTable" minOccurs="0"/>
- *         &lt;element name="Models" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}ModelTable" minOccurs="0"/>
+ *         &lt;element name="Models" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}UAModelTable" minOccurs="0"/>
  *         &lt;element name="Aliases" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}AliasTable" minOccurs="0"/>
  *         &lt;element name="Extensions" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}ListOfExtensions" minOccurs="0"/>
  *         &lt;choice maxOccurs="unbounded" minOccurs="0">
@@ -63,7 +63,7 @@ public class UANodeSet {
     @XmlElement(name = "ServerUris")
     protected UriTable serverUris;
     @XmlElement(name = "Models")
-    protected ModelTable models;
+    protected UAModelTable models;
     @XmlElement(name = "Aliases")
     protected AliasTable aliases;
     @XmlElement(name = "Extensions")
@@ -127,9 +127,9 @@ public class UANodeSet {
      * Gets the value of the models property.
      *
      * @return possible object is
-     * {@link ModelTable }
+     * {@link UAModelTable }
      */
-    public ModelTable getModels() {
+    public UAModelTable getModels() {
         return models;
     }
 
@@ -137,9 +137,9 @@ public class UANodeSet {
      * Sets the value of the models property.
      *
      * @param value allowed object is
-     *              {@link ModelTable }
+     *              {@link UAModelTable }
      */
-    public void setModels(ModelTable value) {
+    public void setModels(UAModelTable value) {
         this.models = value;
     }
 

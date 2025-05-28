@@ -27,7 +27,7 @@ import java.util.List;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="Name" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="Description" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}LocalizedText" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="Description" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}UALocalizedText" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -44,7 +44,7 @@ public class UAMethodArgument {
     @XmlElement(name = "Name")
     protected String name;
     @XmlElement(name = "Description")
-    protected List<LocalizedText> description;
+    protected List<UALocalizedText> description;
 
     /**
      * Gets the value of the name property.
@@ -84,11 +84,11 @@ public class UAMethodArgument {
      *
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link LocalizedText }
+     * {@link UALocalizedText }
      */
-    public List<LocalizedText> getDescription() {
+    public List<UALocalizedText> getDescription() {
         if (description == null) {
-            description = new ArrayList<LocalizedText>();
+            description = new ArrayList<UALocalizedText>();
         }
         return this.description;
     }

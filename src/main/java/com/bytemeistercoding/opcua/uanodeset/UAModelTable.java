@@ -17,12 +17,12 @@ import java.util.List;
 
 
 /**
- * <p>Java class for ModelTable complex type.
+ * <p>Java class for UAModelTable complex type.
  *
  * <p>The following schema fragment specifies the expected content contained within this class.
  *
  * <pre>
- * &lt;complexType name="ModelTable">
+ * &lt;complexType name="UAModelTable">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
@@ -34,10 +34,10 @@ import java.util.List;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ModelTable", propOrder = {
+@XmlType(name = "UAModelTable", propOrder = {
         "model"
 })
-public class ModelTable {
+public class UAModelTable {
 
     @XmlElement(name = "Model")
     protected List<ModelTableEntry> model;

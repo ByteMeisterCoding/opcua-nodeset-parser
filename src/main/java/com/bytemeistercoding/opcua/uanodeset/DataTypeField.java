@@ -25,8 +25,8 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="DisplayName" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}LocalizedText" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="Description" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}LocalizedText" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="DisplayName" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}UALocalizedText" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="Description" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}UALocalizedText" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="Name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="SymbolicName" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}SymbolicName" />
@@ -50,9 +50,9 @@ import java.util.List;
 public class DataTypeField {
 
     @XmlElement(name = "DisplayName")
-    protected List<LocalizedText> displayName;
+    protected List<UALocalizedText> displayName;
     @XmlElement(name = "Description")
-    protected List<LocalizedText> description;
+    protected List<UALocalizedText> description;
     @XmlAttribute(name = "Name", required = true)
     protected String name;
     @XmlAttribute(name = "SymbolicName")
@@ -92,11 +92,11 @@ public class DataTypeField {
      *
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link LocalizedText }
+     * {@link UALocalizedText }
      */
-    public List<LocalizedText> getDisplayName() {
+    public List<UALocalizedText> getDisplayName() {
         if (displayName == null) {
-            displayName = new ArrayList<LocalizedText>();
+            displayName = new ArrayList<UALocalizedText>();
         }
         return this.displayName;
     }
@@ -119,11 +119,11 @@ public class DataTypeField {
      *
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link LocalizedText }
+     * {@link UALocalizedText }
      */
-    public List<LocalizedText> getDescription() {
+    public List<UALocalizedText> getDescription() {
         if (description == null) {
-            description = new ArrayList<LocalizedText>();
+            description = new ArrayList<UALocalizedText>();
         }
         return this.description;
     }

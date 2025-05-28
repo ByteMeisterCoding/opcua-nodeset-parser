@@ -70,10 +70,10 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ModelTable }
+     * Create an instance of {@link UAModelTable }
      */
-    public ModelTable createModelTable() {
-        return new ModelTable();
+    public UAModelTable createModelTable() {
+        return new UAModelTable();
     }
 
     /**
@@ -196,10 +196,10 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link LocalizedText }
+     * Create an instance of {@link UALocalizedText }
      */
-    public LocalizedText createLocalizedText() {
-        return new LocalizedText();
+    public UALocalizedText createLocalizedText() {
+        return new UALocalizedText();
     }
 
     /**

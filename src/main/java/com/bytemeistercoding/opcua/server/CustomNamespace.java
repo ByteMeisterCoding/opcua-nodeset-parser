@@ -21,7 +21,7 @@ import org.eclipse.milo.opcua.sdk.server.api.MonitoredItem;
 import org.eclipse.milo.opcua.sdk.server.nodes.*;
 import org.eclipse.milo.opcua.stack.core.Identifiers;
 import org.eclipse.milo.opcua.stack.core.types.builtin.*;
-import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
+import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UByte;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UShort;
 import org.slf4j.Logger;
@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public class CustomNamespace extends ManagedNamespaceWithLifecycle {
@@ -62,30 +61,11 @@ public class CustomNamespace extends ManagedNamespaceWithLifecycle {
         logger.info("Checking pre-conditions");
         checkPreconditions();
         if (!nodeSet.getUaNodes().isEmpty()) {
-            if (!nodeParser.getNodes(nodeSet, "UAObjectType").isEmpty()) {
-                logger.info("Creating ObjectType nodes");
-                createObjectTypeNodes();
-            } else logger.info("No ObjectType node found");
-
-            if (!nodeParser.getNodes(nodeSet, "UAVariableType").isEmpty()) {
-                logger.info("Creating VariableType nodes");
-                createVariableTypeNodes();
-            } else logger.info("No VariableType node found");
-
-            if (!nodeParser.getNodes(nodeSet, "UAObject").isEmpty()) {
-                logger.info("Creating Object nodes");
-                createObjectNodes();
-            } else logger.info("No Object node found");
-
-            if (!nodeParser.getNodes(nodeSet, "UAVariable").isEmpty()) {
-                logger.info("Creating Variable nodes");
-                createVariableNodes();
-            } else logger.info("No Variable node found");
-
-            if (!nodeParser.getNodes(nodeSet, "UAMethod").isEmpty()) {
-                logger.info("Creating Method nodes");
-                createMethodNodes();
-            } else logger.info("No Method node found");
+            createObjectTypeNodes();
+            createVariableTypeNodes();
+            createObjectNodes();
+            createVariableNodes();
+            createMethodNodes();
         } else throw new IllegalArgumentException("Nodeset is empty");
 
         logger.info("Adding references");
@@ -117,60 +97,104 @@ public class CustomNamespace extends ManagedNamespaceWithLifecycle {
                 Identifiers.HasTypeDefinition,
                 Identifiers.NamespacesType.expanded(),
                 true));
-        logger.info("Created Namespaces object node with NodeId {}", nodeId);
+        logger.info("Created Namespaces object node with NodeId {}", nodeId.toParseableString());
+    }
+
+    private boolean checkIfNodesExist(String nodeClass) {
+        return !nodeParser.getNodes(nodeSet, nodeClass).isEmpty();
+    }
+
+    private static void logNodeNotFound(String nodeClass) {
+        logger.info("No {} node found", nodeClass);
     }
 
     private void createObjectTypeNodes() {
-        for (UANode node : nodeParser.getNodes(nodeSet, "UAObjectType")) {
-            UAObjectType objectType = (UAObjectType) node;
-            UaObjectTypeNode objectTypeNode = new UaObjectTypeNode.UaObjectTypeNodeBuilder(getNodeContext())
-                    .setNodeId(generateNodeId(objectType.getNodeId()))
-                    .setBrowseName(new QualifiedName(getNamespaceIndex(), objectType.getBrowseName().substring(
-                            objectType.getBrowseName().indexOf(':') + 1)))
-                    .setDisplayName(LocalizedText.english(objectType.getDisplayNames().get(0).getValue()))
-                    .setIsAbstract(objectType.isAbstract())
-                    .build();
-            objectTypeNode.setDescription(getDescription(objectType));
-            getNodeManager().addNode(objectTypeNode);
+        if (checkIfNodesExist("UAObjectType")) {
+            logger.info("Creating {} nodes", "UAObjectType");
+            for (UANode node : nodeParser.getNodes(nodeSet, "UAObjectType")) {
+                UAObjectType objectType = (UAObjectType) node;
+                UaObjectTypeNode objectTypeNode = new UaObjectTypeNode.UaObjectTypeNodeBuilder(getNodeContext())
+                        .setNodeId(generateNodeId(objectType.getNodeId()))
+                        .setBrowseName(generateBrowseName(objectType.getBrowseName()))
+                        .setDisplayName(generateDisplayName(objectType.getDisplayNames()))
+                        .setIsAbstract(objectType.isAbstract())
+                        .build();
+                addOptionalBaseAttributes(objectType, objectTypeNode);
+                getNodeManager().addNode(objectTypeNode);
+            }
+        } else logNodeNotFound("ObjectType");
+    }
+
+    private void createVariableTypeNodes() {
+        for (UANode node : nodeParser.getNodes(nodeSet, "UAVariableType")) {
+            UAVariableType variableType = (UAVariableType) node;
+            NodeId nodeId = generateNodeId(variableType.getNodeId());
+            QualifiedName browseName = generateBrowseName(variableType.getBrowseName());
+            LocalizedText displayName = generateDisplayName(variableType.getDisplayNames());
+            Boolean abstractFlag = variableType.isAbstract();
+            LocalizedText description = generateDescription(variableType.getDescriptions());
+            UInteger writeMask = UInteger.valueOf(variableType.getWriteMask());
+            UInteger userWriteMask = UInteger.valueOf(variableType.getUserWriteMask());
+            NodeId dataType = solveDataType(variableType.getDataType());
+            DataValue value = new DataValue(new Variant(variableType.getValue()));
+            Integer valueRank = variableType.getValueRank();
+            UInteger[] arrayDimension = parseStringToUIntegerArray(variableType.getArrayDimensions());
+            UaVariableTypeNode variableTypeNode = new UaVariableTypeNode(getNodeContext(), nodeId, browseName, displayName, description,
+                    writeMask, userWriteMask, value, dataType, valueRank, arrayDimension, abstractFlag);
+            getNodeManager().addNode(variableTypeNode);
         }
     }
 
     private void createObjectNodes() {
-        for (UANode node : nodeParser.getNodes(nodeSet, "UAObject")) {
-            UAObject object = (UAObject) node;
-            NodeId nodeId = generateNodeId(object.getNodeId());
-            LocalizedText displayName = LocalizedText.english(object.getDisplayNames().get(0).getValue());
-            QualifiedName browseName = newQualifiedName(object.getBrowseName().substring(
-                    object.getBrowseName().indexOf(':') + 1));
-            UaObjectNode objectNode = new UaObjectNode(getNodeContext(), nodeId, browseName, displayName);
-            getNodeManager().addNode(objectNode);
-        }
+        if (checkIfNodesExist("UAObject")) {
+            for (UANode node : nodeParser.getNodes(nodeSet, "UAObject")) {
+                UAObject object = (UAObject) node;
+                NodeId nodeId = generateNodeId(object.getNodeId());
+                QualifiedName browseName = generateBrowseName(object.getBrowseName());
+                LocalizedText displayName = generateDisplayName(object.getDisplayNames());
+                UaObjectNode objectNode = new UaObjectNode(getNodeContext(), nodeId, browseName, displayName);
+                objectNode.setEventNotifier(UByte.valueOf(object.getEventNotifier()));
+                addOptionalBaseAttributes(object, objectNode);
+                getNodeManager().addNode(objectNode);
+            }
+        } else logNodeNotFound("Object");
     }
 
     private void createVariableNodes() {
-        for (UANode node : nodeParser.getNodes(nodeSet, "UAVariable")) {
-            UAVariable variable = (UAVariable) node;
-            NodeId nodeId = generateNodeId(variable.getNodeId());
-            LocalizedText displayName = LocalizedText.english(variable.getDisplayNames().get(0).getValue());
-            QualifiedName browseName = newQualifiedName(variable.getBrowseName().substring(
-                    variable.getBrowseName().indexOf(':') + 1));
-            UaVariableNode uaVariable = new UaVariableNode(getNodeContext(), nodeId, browseName, displayName);
-            getNodeManager().addNode(uaVariable);
-        }
+        if (checkIfNodesExist("UAVariable")) {
+            for (UANode node : nodeParser.getNodes(nodeSet, "UAVariable")) {
+                UAVariable variable = (UAVariable) node;
+                NodeId nodeId = generateNodeId(variable.getNodeId());
+                QualifiedName browseName = generateBrowseName(variable.getBrowseName());
+                LocalizedText displayName = generateDisplayName(variable.getDisplayNames());
+                UaVariableNode variableNode = new UaVariableNode(getNodeContext(), nodeId, browseName, displayName);
+                variableNode.setValue(new DataValue(new Variant(variable.getValue())));
+                variableNode.setDataType(solveDataType(variable.getDataType()));
+                variableNode.setValueRank(variable.getValueRank());
+                variableNode.setAccessLevel(UByte.valueOf(variable.getAccessLevel()));
+                variableNode.setUserAccessLevel(UByte.valueOf(variable.getUserAccessLevel()));
+                variableNode.setHistorizing(variable.isHistorizing());
+                addOptionalBaseAttributes(variable, variableNode);
+                variableNode.setArrayDimensions(parseStringToUIntegerArray(variable.getArrayDimensions()));
+                getNodeManager().addNode(variableNode);
+            }
+        } else logNodeNotFound("Variable");
     }
 
     private void createMethodNodes() {
-        for (UANode node : nodeParser.getNodes(nodeSet, "UAMethod")) {
-            UAMethod method = (UAMethod) node;
-            NodeId nodeId = generateNodeId(method.getNodeId());
-            LocalizedText displayName = LocalizedText.english(method.getDisplayNames().get(0).getValue());
-            QualifiedName browseName = newQualifiedName(method.getBrowseName().substring(
-                    method.getBrowseName().indexOf(':') + 1));
-            LocalizedText description = getDescription(method);
-            UaMethodNode methodNode = new UaMethodNode(getNodeContext(), nodeId, browseName, displayName, description,
-                    UInteger.valueOf(method.getWriteMask()), UInteger.valueOf(method.getUserWriteMask()), method.isExecutable(), method.isUserExecutable());
-            getNodeManager().addNode(methodNode);
-        }
+        if (checkIfNodesExist("UAMethod")) {
+            for (UANode node : nodeParser.getNodes(nodeSet, "UAMethod")) {
+                UAMethod method = (UAMethod) node;
+                NodeId nodeId = generateNodeId(method.getNodeId());
+                QualifiedName browseName = generateBrowseName(method.getBrowseName());
+                LocalizedText displayName = generateDisplayName(method.getDisplayNames());
+                LocalizedText description = generateDescription(method.getDescriptions());
+                UaMethodNode methodNode = new UaMethodNode(getNodeContext(), nodeId, browseName, displayName, description,
+                        UInteger.valueOf(method.getWriteMask()), UInteger.valueOf(method.getUserWriteMask()), method.isExecutable(),
+                        method.isUserExecutable());
+                getNodeManager().addNode(methodNode);
+            }
+        } else logNodeNotFound("Method");
     }
 
     public void addReferences() {
@@ -190,87 +214,39 @@ public class CustomNamespace extends ManagedNamespaceWithLifecycle {
         }
     }
 
-    private void createVariableTypeNodes() {
-        for (UANode node : nodeParser.getNodes(nodeSet, "UAVariableType")) {
-            UAVariableType variableType = (UAVariableType) node;
-            NodeId nodeId = generateNodeId(variableType.getNodeId());
-            QualifiedName browseName = newQualifiedName(variableType.getBrowseName().substring(
-                    variableType.getBrowseName().indexOf(':') + 1));
-            LocalizedText displayName = LocalizedText.english(variableType.getDisplayNames().get(0).getValue());
-            Boolean abstractFlag = variableType.isAbstract();
-            LocalizedText description = getDescription(variableType);
-            UInteger writeMask = UInteger.valueOf(variableType.getWriteMask());
-            UInteger userWriteMask = UInteger.valueOf(variableType.getUserWriteMask());
-            NodeId dataType = solveDataType(nodeSet, variableType.getDataType());
-            DataValue value = null;
-            Integer valueRank = variableType.getValueRank();
-            UInteger[] arrayDimension = parseStringToUIntegerArray(variableType.getArrayDimensions());
-            UaVariableTypeNode variableTypeNode = new UaVariableTypeNode(getNodeContext(), nodeId, browseName, displayName, description,
-                    writeMask, userWriteMask, value, dataType, valueRank, arrayDimension, abstractFlag);
-            getNodeManager().addNode(variableTypeNode);
-        }
+    private void addOptionalBaseAttributes(UANode nodesetNode, UaNode serverNode) {
+        serverNode.setDescription(generateDescription(nodesetNode.getDescriptions()));
+        serverNode.setWriteMask(UInteger.valueOf(nodesetNode.getWriteMask()));
+        serverNode.setUserWriteMask(UInteger.valueOf(nodesetNode.getUserWriteMask()));
     }
 
-    /*private void addReferenceToParentTypeNode(List<UAReference> references, UaNode typeNode) {
-        for (UAReference reference : references) {
-            if (reference.getReferenceType().equals("HasSubtype")) {
-                NodeId parentNodeId = generateNodeId(reference.getValue());
-                typeNode.addReference(new Reference(
-                        typeNode.getNodeId(),
-                        Identifiers.HasSubtype,
-                        parentNodeId.expanded(),
-                        false
-                ));
-            }
-        }
-    }
-
-    private void addReferenceToParentNode(UAInstance node, UaNode instanceNode) {
-        if (node.getParentNodeId() != null) {
-            NodeId parentNodeId = generateNodeId(node.getParentNodeId());
-            for (UAReference reference : node.getReferences().getReference()) {
-                if (reference.getValue().equals(parentNodeId.toParseableString())) {
-                    String referenceTypenodeIdString = metaDataParser.getNodeIdFromAliasTable(nodeSet, reference.getReferenceType());
-                    NodeId referenceTypeNodeId = generateNodeId(referenceTypenodeIdString);
-                    instanceNode.addReference(new Reference(
-                            instanceNode.getNodeId(),
-                            referenceTypeNodeId,
-                            parentNodeId.expanded(),
-                            reference.isIsForward()
-                    ));
-                }
-            }
+    private QualifiedName generateBrowseName(String browsenameString) {
+        String[] parts = browsenameString.split(":");
+        if (parts.length == 1) {
+            return newQualifiedName(parts[0]);
         } else {
-            for (UAReference reference : node.getReferences().getReference()) {
-                if (reference.getReferenceType().equals("Organizes")) {
-                    NodeId parentNodeId = generateNodeId(reference.getValue());
-                    instanceNode.addReference(new Reference(
-                            instanceNode.getNodeId(),
-                            Identifiers.Organizes,
-                            parentNodeId.expanded(),
-                            reference.isIsForward()
-                    ));
-                    logger.info("Adding reference Organizes from {} to {}", parentNodeId.toParseableString(), instanceNode.getNodeId().toParseableString());
-                } else if (reference.getReferenceType().equals("HasComponent")) {
-                    NodeId parentNodeId = generateNodeId(reference.getValue());
-                    instanceNode.addReference(new Reference(
-                            instanceNode.getNodeId(),
-                            Identifiers.HasComponent,
-                            parentNodeId.expanded(),
-                            reference.isIsForward()
-                    ));
-                    logger.info("Adding reference HasComponent from {} to {}", parentNodeId.toParseableString(), instanceNode.getNodeId().toParseableString());
-                }
-            }
+            return newQualifiedName(parts[1]);
         }
-    }*/
+    }
 
-    private LocalizedText getDescription(UANode node) {
-        if (!node.getDescriptions().isEmpty())
-            return LocalizedText.english(node.getDescriptions().get(0).getValue());
+    private LocalizedText generateDisplayName(List<UALocalizedText> displayNames) {
+        String locale = displayNames.get(0).getLocale();
+        String value = displayNames.get(0).getValue();
+        if (locale == null || locale.isEmpty())
+            return LocalizedText.english(value);
         else
-            logger.info("No description found for node {}", generateNodeId(node.getNodeId()).toParseableString());
-        return new LocalizedText(null);
+            return new LocalizedText(locale, value);
+    }
+
+    private LocalizedText generateDescription(List<UALocalizedText> descriptions) {
+        if (!descriptions.isEmpty()) {
+            String locale = descriptions.get(0).getLocale();
+            String value = descriptions.get(0).getValue();
+            if (locale == null || locale.isEmpty())
+                return LocalizedText.english(value);
+            else return new LocalizedText(locale, value);
+        }
+        return new LocalizedText("");
     }
 
     public static UInteger[] parseStringToUIntegerArray(String input) {
@@ -317,19 +293,12 @@ public class CustomNamespace extends ManagedNamespaceWithLifecycle {
         }
     }
 
-    private NodeId solveDataType(UANodeSet nodeSet, String dataType) {
+    private NodeId solveDataType(String dataType) {
         if (!dataType.equals("i=24")) {
             String nodeIdString = metaDataParser.getNodeIdFromAliasTable(nodeSet, dataType);
             return generateNodeId(nodeIdString);
         } else
             return generateNodeId(dataType);
-    }
-
-    private Optional<NodeId> getTypeDefinitionNode(UANode node) {
-        return node.getReferences().getReference().stream()
-                .filter(ref -> "HasTypeDefinition".equals(ref.getReferenceType()))
-                .findFirst()
-                .map(ref -> generateNodeId(ref.getValue()));
     }
 
     @Override
