@@ -20,6 +20,7 @@ import org.eclipse.milo.opcua.sdk.server.api.ManagedNamespaceWithLifecycle;
 import org.eclipse.milo.opcua.sdk.server.api.MonitoredItem;
 import org.eclipse.milo.opcua.sdk.server.nodes.*;
 import org.eclipse.milo.opcua.stack.core.Identifiers;
+import org.eclipse.milo.opcua.stack.core.UaException;
 import org.eclipse.milo.opcua.stack.core.types.builtin.*;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UByte;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
@@ -120,6 +121,11 @@ public class CustomNamespace extends ManagedNamespaceWithLifecycle {
                         .setIsAbstract(objectType.isAbstract())
                         .build();
                 addOptionalBaseAttributes(objectType, objectTypeNode);
+                getServer().getObjectTypeManager().registerObjectType(
+                        objectTypeNode.getNodeId(),
+                        UaObjectNode.class,
+                        UaObjectNode::new);
+
                 getNodeManager().addNode(objectTypeNode);
             }
         } else logNodeNotFound("ObjectType");
@@ -152,13 +158,31 @@ public class CustomNamespace extends ManagedNamespaceWithLifecycle {
                 NodeId nodeId = generateNodeId(object.getNodeId());
                 QualifiedName browseName = generateBrowseName(object.getBrowseName());
                 LocalizedText displayName = generateDisplayName(object.getDisplayNames());
-                UaObjectNode objectNode = new UaObjectNode(getNodeContext(), nodeId, browseName, displayName);
-                objectNode.setEventNotifier(UByte.valueOf(object.getEventNotifier()));
-                addOptionalBaseAttributes(object, objectNode);
-                getNodeManager().addNode(objectNode);
+                String parentNodeId = findParentNodeId(object);
+                //UaObjectNode objectNode = new UaObjectNode(getNodeContext(), nodeId, browseName, displayName);
+                try {
+                    UaObjectNode objectNode = (UaObjectNode) getNodeFactory().createNode(nodeId,
+                            generateNodeId(parentNodeId));
+                    objectNode.setBrowseName(browseName);
+                    objectNode.setDisplayName(displayName);
+                    objectNode.setEventNotifier(UByte.valueOf(object.getEventNotifier()));
+                    addOptionalBaseAttributes(object, objectNode);
+                    getNodeManager().addNode(objectNode);
+                } catch (UaException e) {
+                    logger.error("Error creating instance of ObjectType: {}", e.getMessage(), e);
+                }
             }
         } else logNodeNotFound("Object");
     }
+    
+    private String findParentNodeId(UAInstance instanceNode) {
+        return instanceNode.getReferences().getReference().stream()
+                .filter(ref -> "HasTypeDefinition".equals(ref.getReferenceType()))
+                .map(UAReference::getValue)
+                .findFirst()
+                .orElse("");
+    }
+
 
     private void createVariableNodes() {
         if (checkIfNodesExist("UAVariable")) {

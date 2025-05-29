@@ -5,7 +5,6 @@
 // Generated on: 2025.03.15 at 12:19:21 PM CET 
 //
 
-
 package com.bytemeistercoding.opcua.uanodeset;
 
 import javax.xml.bind.annotation.*;
@@ -19,9 +18,9 @@ import javax.xml.bind.annotation.*;
  * <pre>
  * &lt;complexType name="UAInstance">
  *   &lt;complexContent>
- *     &lt;extension base="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}UANode">
- *       &lt;attribute name="ParentNodeId" type="{http://opcfoundation.org/UA/2011/03/UANodeSet.xsd}NodeId" />
- *       &lt;attribute name="DesignToolOnly" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
+ *     &lt;extension base="UANode">
+ *       &lt;attribute name="ParentNodeId" type="NodeId" />
+ *       &lt;attribute name="DesignToolOnly" type="boolean" default="false" />
  *     &lt;/extension>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -50,6 +49,9 @@ public class UAInstance
      * {@link String }
      */
     public String getParentNodeId() {
+        if (parentNodeId == null) {
+            return "";
+        }
         return parentNodeId;
     }
 
@@ -70,11 +72,7 @@ public class UAInstance
      * {@link Boolean }
      */
     public boolean isDesignToolOnly() {
-        if (designToolOnly == null) {
-            return false;
-        } else {
-            return designToolOnly;
-        }
+        return Boolean.TRUE.equals(designToolOnly);
     }
 
     /**
