@@ -1,21 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<UANodeSet
-        xmlns:ua="http://unifiedautomation.com/Configuration/NodeSet.xsd"
-        xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd"
-        xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd">
+<UANodeSet xmlns:s1="http://bytemeistercoding.com/test_model/Types.xsd" xmlns:ua="http://unifiedautomation.com/Configuration/NodeSet.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd" xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
     <NamespaceUris>
-        <Uri>http://yourorganisation.org/sample-model/</Uri>
+        <Uri>http://bytemeistercoding.com/test_model/</Uri>
     </NamespaceUris>
     <Models>
-        <Model Version="1.0.0" ModelUri="http://yourorganisation.org/sample-model/"
-               PublicationDate="2025-05-04T11:00:29Z">
-            <RequiredModel Version="1.05.04" ModelUri="http://opcfoundation.org/UA/"
-                           PublicationDate="2024-12-01T00:00:00Z"/>
+        <Model Version="1.0.0" ModelUri="http://bytemeistercoding.com/test_model/" PublicationDate="2025-05-30T12:29:07Z">
+            <RequiredModel Version="1.05.04" ModelUri="http://opcfoundation.org/UA/" PublicationDate="2024-12-01T00:00:00Z"/>
         </Model>
     </Models>
     <Aliases>
         <Alias Alias="Boolean">i=1</Alias>
-        <Alias Alias="Double">i=11</Alias>
         <Alias Alias="String">i=12</Alias>
         <Alias Alias="DateTime">i=13</Alias>
         <Alias Alias="Organizes">i=35</Alias>
@@ -24,46 +18,42 @@
         <Alias Alias="HasSubtype">i=45</Alias>
         <Alias Alias="HasProperty">i=46</Alias>
         <Alias Alias="HasComponent">i=47</Alias>
+        <Alias Alias="AccessRestrictionType">i=95</Alias>
         <Alias Alias="IdType">i=256</Alias>
         <Alias Alias="NumericRange">i=291</Alias>
     </Aliases>
     <Extensions>
         <Extension>
-            <ua:ModelInfo Version="1.7.0" Tool="UaModeler" Hash="VzIk2kPww/IuBm+y8rz5QQ=="/>
+            <ua:ModelInfo Tool="UaModeler" Hash="K1uovJMf0Amjti9onA0ecQ==" Version="1.7.0"/>
         </Extension>
     </Extensions>
-    <UAVariableType ValueRank="-2" NodeId="ns=1;i=2003" BrowseName="1:MyVariableType">
-        <DisplayName Locale="EN">MyVariableType</DisplayName>
-        <References>
-            <Reference IsForward="false" ReferenceType="HasSubtype">i=63</Reference>
-        </References>
-    </UAVariableType>
     <UAObjectType NodeId="ns=1;i=1003" BrowseName="1:MyObjectType">
-        <DisplayName>MyObjectType</DisplayName>
+        <DisplayName Locale="EN">MyObjectType</DisplayName>
+        <Description Locale="EN">a custom objecttype node</Description>
         <References>
             <Reference IsForward="false" ReferenceType="HasSubtype">i=58</Reference>
             <Reference ReferenceType="HasComponent">ns=1;i=7001</Reference>
             <Reference ReferenceType="HasComponent">ns=1;i=6001</Reference>
         </References>
     </UAObjectType>
-    <UAMethod ParentNodeId="ns=1;i=1003" NodeId="ns=1;i=7001" BrowseName="1:MyMethod">
+    <UAMethod NodeId="ns=1;i=7001" BrowseName="1:MyMethod" ParentNodeId="ns=1;i=1003">
         <DisplayName>MyMethod</DisplayName>
         <References>
             <Reference ReferenceType="HasModellingRule">i=78</Reference>
             <Reference IsForward="false" ReferenceType="HasComponent">ns=1;i=1003</Reference>
         </References>
     </UAMethod>
-    <UAVariable AccessLevel="3" ParentNodeId="ns=1;i=1003" DataType="Double" NodeId="ns=1;i=6001"
-                BrowseName="1:MyVariable">
+    <UAVariable NodeId="ns=1;i=6001" AccessLevel="3" BrowseName="1:MyVariable" ParentNodeId="ns=1;i=1003" DataType="Boolean">
         <DisplayName>MyVariable</DisplayName>
         <References>
-            <Reference ReferenceType="HasTypeDefinition">ns=1;i=2003</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=2365</Reference>
             <Reference ReferenceType="HasModellingRule">i=78</Reference>
             <Reference IsForward="false" ReferenceType="HasComponent">ns=1;i=1003</Reference>
         </References>
     </UAVariable>
     <UAObject NodeId="ns=1;i=5003" BrowseName="1:MyObject">
-        <DisplayName>MyObject</DisplayName>
+        <DisplayName Locale="EN">MyObject</DisplayName>
+        <Description Locale="EN">Instance of MyObjectType</Description>
         <References>
             <Reference ReferenceType="HasTypeDefinition">ns=1;i=1003</Reference>
             <Reference IsForward="false" ReferenceType="Organizes">i=85</Reference>
@@ -71,26 +61,25 @@
             <Reference ReferenceType="HasComponent">ns=1;i=6002</Reference>
         </References>
     </UAObject>
-    <UAMethod ParentNodeId="ns=1;i=5003" MethodDeclarationId="ns=1;i=7001" NodeId="ns=1;i=7002" BrowseName="1:MyMethod">
+    <UAMethod NodeId="ns=1;i=7002" MethodDeclarationId="ns=1;i=7001" BrowseName="1:MyMethod" ParentNodeId="ns=1;i=5003">
         <DisplayName>MyMethod</DisplayName>
         <References>
             <Reference IsForward="false" ReferenceType="HasComponent">ns=1;i=5003</Reference>
         </References>
     </UAMethod>
-    <UAVariable AccessLevel="3" ParentNodeId="ns=1;i=5003" DataType="Double" NodeId="ns=1;i=6002"
-                BrowseName="1:MyVariable">
+    <UAVariable NodeId="ns=1;i=6002" AccessLevel="3" BrowseName="1:MyVariable" ParentNodeId="ns=1;i=5003" DataType="Boolean">
         <DisplayName>MyVariable</DisplayName>
         <References>
-            <Reference ReferenceType="HasTypeDefinition">ns=1;i=2003</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=2365</Reference>
             <Reference IsForward="false" ReferenceType="HasComponent">ns=1;i=5003</Reference>
         </References>
     </UAVariable>
-    <UAObject SymbolicName="http___yourorganisation_org_sample_model_" NodeId="ns=1;i=5004"
-              BrowseName="1:http://yourorganisation.org/sample-model/">
-        <DisplayName>http://yourorganisation.org/sample-model/</DisplayName>
+    <UAObject NodeId="ns=1;i=5004" BrowseName="1:http://bytemeistercoding.com/test_model/" SymbolicName="http___bytemeistercoding_com_test_model_">
+        <DisplayName>http://bytemeistercoding.com/test_model/</DisplayName>
         <References>
             <Reference ReferenceType="HasTypeDefinition">i=11616</Reference>
-            <Reference IsForward="false" ReferenceType="HasComponent">ns=1;i=11715</Reference>
+            <Reference IsForward="false" ReferenceType="HasComponent">i=11715</Reference>
+            <Reference ReferenceType="HasProperty">ns=1;i=6012</Reference>
             <Reference ReferenceType="HasProperty">ns=1;i=6003</Reference>
             <Reference ReferenceType="HasProperty">ns=1;i=6004</Reference>
             <Reference ReferenceType="HasProperty">ns=1;i=6005</Reference>
@@ -100,7 +89,18 @@
             <Reference ReferenceType="HasProperty">ns=1;i=6009</Reference>
         </References>
     </UAObject>
-    <UAVariable ParentNodeId="ns=1;i=5004" DataType="Boolean" NodeId="ns=1;i=6003" BrowseName="IsNamespaceSubset">
+    <UAVariable NodeId="ns=1;i=6012" BrowseName="DefaultAccessRestrictions" ParentNodeId="ns=1;i=5004" DataType="AccessRestrictionType">
+        <DisplayName>DefaultAccessRestrictions</DisplayName>
+        <References>
+            <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+            <Reference IsForward="false" ReferenceType="HasProperty">ns=1;i=5004</Reference>
+        </References>
+        <RolePermissions>
+            <RolePermission Permissions="98">i=15704</RolePermission>
+            <RolePermission Permissions="1">i=15644</RolePermission>
+        </RolePermissions>
+    </UAVariable>
+    <UAVariable NodeId="ns=1;i=6003" BrowseName="IsNamespaceSubset" ParentNodeId="ns=1;i=5004" DataType="Boolean">
         <DisplayName>IsNamespaceSubset</DisplayName>
         <References>
             <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
@@ -110,28 +110,27 @@
             <uax:Boolean>false</uax:Boolean>
         </Value>
     </UAVariable>
-    <UAVariable ParentNodeId="ns=1;i=5004" DataType="DateTime" NodeId="ns=1;i=6004"
-                BrowseName="NamespacePublicationDate">
+    <UAVariable NodeId="ns=1;i=6004" BrowseName="NamespacePublicationDate" ParentNodeId="ns=1;i=5004" DataType="DateTime">
         <DisplayName>NamespacePublicationDate</DisplayName>
         <References>
             <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
             <Reference IsForward="false" ReferenceType="HasProperty">ns=1;i=5004</Reference>
         </References>
         <Value>
-            <uax:DateTime>2025-05-04T11:00:29Z</uax:DateTime>
+            <uax:DateTime>2025-05-30T12:29:07Z</uax:DateTime>
         </Value>
     </UAVariable>
-    <UAVariable ParentNodeId="ns=1;i=5004" DataType="String" NodeId="ns=1;i=6005" BrowseName="NamespaceUri">
+    <UAVariable NodeId="ns=1;i=6005" BrowseName="NamespaceUri" ParentNodeId="ns=1;i=5004" DataType="String">
         <DisplayName>NamespaceUri</DisplayName>
         <References>
             <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
             <Reference IsForward="false" ReferenceType="HasProperty">ns=1;i=5004</Reference>
         </References>
         <Value>
-            <uax:String>http://yourorganisation.org/sample-model/</uax:String>
+            <uax:String>http://bytemeistercoding.com/test_model/</uax:String>
         </Value>
     </UAVariable>
-    <UAVariable ParentNodeId="ns=1;i=5004" DataType="String" NodeId="ns=1;i=6006" BrowseName="NamespaceVersion">
+    <UAVariable NodeId="ns=1;i=6006" BrowseName="NamespaceVersion" ParentNodeId="ns=1;i=5004" DataType="String">
         <DisplayName>NamespaceVersion</DisplayName>
         <References>
             <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
@@ -141,8 +140,7 @@
             <uax:String>1.0.0</uax:String>
         </Value>
     </UAVariable>
-    <UAVariable ValueRank="1" ParentNodeId="ns=1;i=5004" ArrayDimensions="0" DataType="IdType" NodeId="ns=1;i=6007"
-                BrowseName="StaticNodeIdTypes">
+    <UAVariable NodeId="ns=1;i=6007" ArrayDimensions="0" ValueRank="1" BrowseName="StaticNodeIdTypes" ParentNodeId="ns=1;i=5004" DataType="IdType">
         <DisplayName>StaticNodeIdTypes</DisplayName>
         <References>
             <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
@@ -154,16 +152,14 @@
             </uax:ListOfInt32>
         </Value>
     </UAVariable>
-    <UAVariable ValueRank="1" ParentNodeId="ns=1;i=5004" ArrayDimensions="0" DataType="NumericRange"
-                NodeId="ns=1;i=6008" BrowseName="StaticNumericNodeIdRange">
+    <UAVariable NodeId="ns=1;i=6008" ArrayDimensions="0" ValueRank="1" BrowseName="StaticNumericNodeIdRange" ParentNodeId="ns=1;i=5004" DataType="NumericRange">
         <DisplayName>StaticNumericNodeIdRange</DisplayName>
         <References>
             <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
             <Reference IsForward="false" ReferenceType="HasProperty">ns=1;i=5004</Reference>
         </References>
     </UAVariable>
-    <UAVariable ParentNodeId="ns=1;i=5004" DataType="String" NodeId="ns=1;i=6009"
-                BrowseName="StaticStringNodeIdPattern">
+    <UAVariable NodeId="ns=1;i=6009" BrowseName="StaticStringNodeIdPattern" ParentNodeId="ns=1;i=5004" DataType="String">
         <DisplayName>StaticStringNodeIdPattern</DisplayName>
         <References>
             <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
