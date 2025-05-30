@@ -12,6 +12,7 @@ import com.bytemeistercoding.opcua.parser.MetaDataParser;
 import com.bytemeistercoding.opcua.parser.NodeIdParser;
 import com.bytemeistercoding.opcua.parser.UaNodeParser;
 import com.bytemeistercoding.opcua.uanodeset.*;
+import org.eclipse.milo.opcua.sdk.core.AccessLevel;
 import org.eclipse.milo.opcua.sdk.core.Reference;
 import org.eclipse.milo.opcua.sdk.server.Lifecycle;
 import org.eclipse.milo.opcua.sdk.server.OpcUaServer;
@@ -58,9 +59,9 @@ public class CustomNamespace extends ManagedNamespaceWithLifecycle {
     private void createAndAddNodes() {
         logger.info("Creating Namespaces object node");
         createNamespacesObject();
-        logger.info("Checking pre-conditions");
         checkPreconditions();
         if (!nodeSet.getUaNodes().isEmpty()) {
+            logger.info("Number of nodes in the nodeset file = {}", nodeSet.getUaNodes().size());
             createObjectTypeNodes();
             createVariableTypeNodes();
             createObjectNodes();
@@ -71,8 +72,8 @@ public class CustomNamespace extends ManagedNamespaceWithLifecycle {
         logger.info("Adding references");
         addReferences();
 
-        logger.info("Nodes in the nodeset file {}", nodeSet.getUaNodes().size());
-        logger.info("No of Nodes created {}", getNodeManager().getNodes().size());
+        logger.info("Number of nodes created = {}", getNodeManager().getNodes().size());
+
     }
 
     private void checkPreconditions() {
@@ -100,7 +101,6 @@ public class CustomNamespace extends ManagedNamespaceWithLifecycle {
                 Identifiers.HasTypeDefinition,
                 Identifiers.NamespacesType.expanded(),
                 true));
-        logger.info("Created Namespaces object node with NodeId {}", nodeId.toParseableString());
     }
 
     private boolean checkIfNodesExist(String nodeClass) {
@@ -111,9 +111,13 @@ public class CustomNamespace extends ManagedNamespaceWithLifecycle {
         logger.info("No {} node found", nodeClass);
     }
 
+    private static void logCreatingNode(String nodeClass) {
+        logger.info("Creating {} nodes", nodeClass);
+    }
+
     private void createObjectTypeNodes() {
         if (checkIfNodesExist("UAObjectType")) {
-            logger.info("Creating {} nodes", "UAObjectType");
+            logCreatingNode("ObjectType");
             for (UANode node : nodeParser.getNodes(nodeSet, "UAObjectType")) {
                 UAObjectType objectType = (UAObjectType) node;
                 UaObjectTypeNode objectTypeNode = new UaObjectTypeNode.UaObjectTypeNodeBuilder(getNodeContext())
@@ -134,33 +138,49 @@ public class CustomNamespace extends ManagedNamespaceWithLifecycle {
     }
 
     private void createVariableTypeNodes() {
-        for (UANode node : nodeParser.getNodes(nodeSet, "UAVariableType")) {
-            UAVariableType variableType = (UAVariableType) node;
-            NodeId nodeId = generateNodeId(variableType.getNodeId());
-            QualifiedName browseName = generateBrowseName(variableType.getBrowseName());
-            LocalizedText displayName = generateDisplayName(variableType.getDisplayNames());
-            Boolean abstractFlag = variableType.isAbstract();
-            LocalizedText description = generateDescription(variableType.getDescriptions());
-            UInteger writeMask = UInteger.valueOf(variableType.getWriteMask());
-            UInteger userWriteMask = UInteger.valueOf(variableType.getUserWriteMask());
-            NodeId dataType = solveDataType(variableType.getDataType());
-            DataValue value = new DataValue(new Variant(variableType.getValue()));
-            Integer valueRank = variableType.getValueRank();
-            UInteger[] arrayDimension = parseStringToUIntegerArray(variableType.getArrayDimensions());
-            UaVariableTypeNode variableTypeNode = new UaVariableTypeNode(getNodeContext(), nodeId, browseName, displayName, description,
-                    writeMask, userWriteMask, value, dataType, valueRank, arrayDimension, abstractFlag);
-            getNodeManager().addNode(variableTypeNode);
-        }
+        if (checkIfNodesExist("UAVariableType")) {
+            logCreatingNode("VariableType");
+            for (UANode node : nodeParser.getNodes(nodeSet, "UAVariableType")) {
+                UAVariableType variableType = (UAVariableType) node;
+                NodeId nodeId = generateNodeId(variableType.getNodeId());
+                QualifiedName browseName = generateBrowseName(variableType.getBrowseName());
+                LocalizedText displayName = generateDisplayName(variableType.getDisplayNames());
+                Boolean abstractFlag = variableType.isAbstract();
+                LocalizedText description = generateDescription(variableType.getDescriptions());
+                UInteger writeMask = UInteger.valueOf(variableType.getWriteMask());
+                UInteger userWriteMask = UInteger.valueOf(variableType.getUserWriteMask());
+                NodeId dataType = solveDataType(variableType.getDataType());
+                DataValue value = new DataValue(new Variant(variableType.getValue()));
+                Integer valueRank = variableType.getValueRank();
+                UInteger[] arrayDimension = parseStringToUIntegerArray(variableType.getArrayDimensions());
+                UaVariableTypeNode variableTypeNode = new UaVariableTypeNode(getNodeContext(), nodeId, browseName, displayName, description,
+                        writeMask, userWriteMask, value, dataType, valueRank, arrayDimension, abstractFlag);
+                getNodeManager().addNode(variableTypeNode);
+            }
+        } else logNodeNotFound("VariableType");
     }
 
     private void createObjectNodes() {
         if (checkIfNodesExist("UAObject")) {
+            logCreatingNode("Object");
             for (UANode node : nodeParser.getNodes(nodeSet, "UAObject")) {
                 UAObject object = (UAObject) node;
                 NodeId nodeId = generateNodeId(object.getNodeId());
                 QualifiedName browseName = generateBrowseName(object.getBrowseName());
                 LocalizedText displayName = generateDisplayName(object.getDisplayNames());
                 UaObjectNode objectNode = new UaObjectNode(getNodeContext(), nodeId, browseName, displayName);
+                /*String parentNodeId = findParentNodeId(object);
+                try {
+                    UaObjectNode objectNode = (UaObjectNode) getNodeFactory().createNode(nodeId,
+                            generateNodeId(parentNodeId));
+                    objectNode.setBrowseName(browseName);
+                    objectNode.setDisplayName(displayName);
+                    objectNode.setEventNotifier(UByte.valueOf(object.getEventNotifier()));
+                    addOptionalBaseAttributes(object, objectNode);
+                    getNodeManager().addNode(objectNode);
+                } catch (UaException e) {
+                    logger.error("Error creating instance of ObjectType: {}", e.getMessage(), e);
+                }*/
                 objectNode.setEventNotifier(UByte.valueOf(object.getEventNotifier()));
                 addOptionalBaseAttributes(object, objectNode);
                 getNodeManager().addNode(objectNode);
@@ -168,14 +188,23 @@ public class CustomNamespace extends ManagedNamespaceWithLifecycle {
         } else logNodeNotFound("Object");
     }
 
+    private String findParentNodeId(UAInstance instanceNode) {
+        return instanceNode.getReferences().getReference().stream()
+                .filter(ref -> "HasTypeDefinition".equals(ref.getReferenceType()))
+                .map(UAReference::getValue)
+                .findFirst()
+                .orElse("");
+    }
+
     private void createVariableNodes() {
         if (checkIfNodesExist("UAVariable")) {
+            logCreatingNode("Variable");
             for (UANode node : nodeParser.getNodes(nodeSet, "UAVariable")) {
                 UAVariable variable = (UAVariable) node;
                 NodeId nodeId = generateNodeId(variable.getNodeId());
                 QualifiedName browseName = generateBrowseName(variable.getBrowseName());
                 LocalizedText displayName = generateDisplayName(variable.getDisplayNames());
-                UaVariableNode variableNode = new UaVariableNode(getNodeContext(), nodeId, browseName, displayName);
+                /*UaVariableNode variableNode = new UaVariableNode(getNodeContext(), nodeId, browseName, displayName);
                 variableNode.setValue(new DataValue(new Variant(variable.getValue())));
                 variableNode.setDataType(solveDataType(variable.getDataType()));
                 variableNode.setValueRank(variable.getValueRank());
@@ -183,7 +212,18 @@ public class CustomNamespace extends ManagedNamespaceWithLifecycle {
                 variableNode.setUserAccessLevel(UByte.valueOf(variable.getUserAccessLevel()));
                 variableNode.setHistorizing(variable.isHistorizing());
                 addOptionalBaseAttributes(variable, variableNode);
-                variableNode.setArrayDimensions(parseStringToUIntegerArray(variable.getArrayDimensions()));
+                variableNode.setArrayDimensions(parseStringToUIntegerArray(variable.getArrayDimensions()));*/
+
+                UaVariableNode variableNode = new UaVariableNode.UaVariableNodeBuilder(getNodeContext())
+                        .setNodeId(nodeId)
+                        .setAccessLevel(AccessLevel.READ_WRITE)
+                        .setUserAccessLevel(AccessLevel.READ_WRITE)
+                        .setBrowseName(browseName)
+                        .setDisplayName(displayName)
+                        .setDataType(solveDataType(variable.getDataType()))
+                        .setTypeDefinition(Identifiers.BaseDataVariableType)
+                        .build();
+
                 getNodeManager().addNode(variableNode);
             }
         } else logNodeNotFound("Variable");
@@ -191,6 +231,7 @@ public class CustomNamespace extends ManagedNamespaceWithLifecycle {
 
     private void createMethodNodes() {
         if (checkIfNodesExist("UAMethod")) {
+            logCreatingNode("Method");
             for (UANode node : nodeParser.getNodes(nodeSet, "UAMethod")) {
                 UAMethod method = (UAMethod) node;
                 NodeId nodeId = generateNodeId(method.getNodeId());

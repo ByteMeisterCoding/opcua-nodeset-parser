@@ -18,8 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class MetaDataParser {
-
-    // get the namespace uri, publication date, version and required models from the nodeset
+    
     public String getNamespaceUri(UANodeSet nodeset) {
         if (!nodeset.getModels().getListOfModels().isEmpty())
             return nodeset.getModels().getListOfModels().get(0).getModelUri();

@@ -61,7 +61,7 @@ public class ExampleServer {
     private static final int TCP_BIND_PORT = 12686;
     private static final int HTTPS_BIND_PORT = 8443;
     private final OpcUaServer server;
-    private CustomNamespace customNamespace;
+    private final CustomNamespace customNamespace;
     private static final Logger logger = LoggerFactory.getLogger(ExampleServer.class);
 
     public static void main(String[] args) throws Exception {
@@ -171,7 +171,7 @@ public class ExampleServer {
 
         server = new OpcUaServer(serverConfig);
         NodesetParser nodesetParser = new NodesetParser();
-        UANodeSet sampleModelNodeset = nodesetParser.parseNodesetFile("nodeset-files/sample-model.xml");
+        UANodeSet sampleModelNodeset = nodesetParser.parseNodesetFile("nodeset-files/test_model.xml");
         customNamespace = new CustomNamespace(server, sampleModelNodeset);
         customNamespace.startup();
     }
