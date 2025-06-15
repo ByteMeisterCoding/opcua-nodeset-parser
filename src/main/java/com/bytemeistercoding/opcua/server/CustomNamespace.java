@@ -69,11 +69,10 @@ public class CustomNamespace extends ManagedNamespaceWithLifecycle {
             createMethodNodes();
         } else throw new IllegalArgumentException("Nodeset is empty");
 
-        logger.info("Adding references");
+        logger.info("Adding references to nodes");
         addReferences();
 
         logger.info("Number of nodes created = {}", getNodeManager().getNodes().size());
-
     }
 
     private void checkPreconditions() {
